@@ -43,7 +43,7 @@ const FrontPage: React.FC = () => {
               立即加入
             </Link>
             <Link to='/qanda' className={styles.heroSecondaryCta}>
-              开始探索 →
+              先行探索 &rarr;
             </Link>
           </div>
 
@@ -163,16 +163,34 @@ const FrontPage: React.FC = () => {
             </div>
             <div className={styles.footerLinks}>
               <div className={styles.linkGroup}>
-                <h4>核心功能</h4>
+                <h4>
+                  <span>核心功能</span>
+                </h4>
                 <Link to='/qanda'>在线答疑</Link>
                 {/* <Link to='/forum'>学习论坛</Link> */}
                 <Link to='/teamup'>组队学习</Link>
                 <Link to='/datastation'>资料站</Link>
               </div>
               <div className={styles.linkGroup}>
-                <h4>快速入口</h4>
+                <h4>
+                  <span>快速入口</span>
+                </h4>
                 <Link to='/login'>登录</Link>
                 <Link to='/register'>注册</Link>
+              </div>
+              <div className={styles.linkGroup}>
+                <h4>
+                  <span>加入我们</span>
+                </h4>
+
+                <a
+                  href='https://qm.qq.com/q/kfkXxbGSWW'
+                  target='_blank'
+                  rel='noopener noreferrer' // 安全性设置，防止钓鱼攻击
+                  className='w-full'
+                >
+                  加入MUNDO开发组🌟
+                </a>
               </div>
             </div>
           </div>
