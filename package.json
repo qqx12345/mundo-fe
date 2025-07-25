@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "-": "^0.0.1",
-    "@arco-design/web-react": "^2.66.1",
+    "@arco-design/web-react": "^2.66.2",
     "@capacitor/android": "^7.4.0",
     "@capacitor/app": "^7.0.1",
     "@capacitor/cli": "^7.4.0",

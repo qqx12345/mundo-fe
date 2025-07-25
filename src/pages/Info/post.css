@@ -1,0 +1,55 @@
+.postListContainer {
+  padding-top: 0.5rem;
+  max-height: 100%;
+  overflow: scroll;
+}
+
+.postItem {
+  position: relative;
+  cursor: pointer;
+  align-items: center;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.postItem:hover {
+  border: 1px solid #525d6f;
+  background-color: #364153;
+}
+
+.postDeleteIconContainer {
+  font-size: 1.3rem;
+  border-radius: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.8rem;
+}
+
+.postDeleteIconContainer:hover {
+  border: 1px solid #525d6f;
+  background-color: #20293a;
+}
+
+.statusContainer {
+  background-color: #212434;
+  display: block;
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 8px;
+  font-weight: 400;
+}
+
+.rejected {
+  color: #fa5252;
+}
+
+.approved {
+  color: #4c6ef5;
+}
+
+.pending {
+  color: #edf2ff;
+}

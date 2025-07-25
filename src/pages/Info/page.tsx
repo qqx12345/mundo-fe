@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react'
 import TeamList from '@/pages/Info/TeamList'
+import PostList from '@/pages/Info/PostList.tsx'
 import './specialCss.css'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { Modal, Input, Message, Form } from '@arco-design/web-react'
+import pageStyle from './page.module.css'
 import {
   getAvatar,
   generateAvatar,
@@ -10,10 +12,12 @@ import {
   updatePerson,
   addTeam,
   getMyTeam,
-  getProfile
+  getProfile,
+  getMyPosts
 } from '@/router/api'
 import styles from '@/components/Header/Header.module.css'
 import type { Team } from '@/pages/Info/TeamList'
+import { Post } from '@/interfaces/post'
 import { updateTeam as updatedTeamAPI } from '@/router/api'
 import MobilePage from './MobilePage.tsx'
 interface User {
@@ -26,6 +30,9 @@ const FormItem = Form.Item
 const InfoManage: React.FC = () => {
   const [user, setUser] = useState<User | null>(null)
   const [teamList, setTeamList] = useState<Team[]>([])
+  const [posts, setPosts] = useState<Post[]>([])
+  const [loading, setLoading] = useState(false)
+
   const DEFAULT_AVATAR =
     'https://cdn.pixabay.com/photo/2018/05/31/15/06/see-no-evil-3444212_1280.jpg'
   const [avatar, setAvatar] = useState<string | null>(DEFAULT_AVATAR)
@@ -94,6 +101,18 @@ const InfoManage: React.FC = () => {
       console.error('获取队伍列表失败：', error)
     }
   }
+  //获取用户帖子
+  const fetchPosts = async () => {
+    setLoading(true)
+    try {
+      const data = await getMyPosts(token as string)
+      setPosts(data)
+    } catch (e) {
+      setPosts([])
+    }
+    setLoading(false)
+  }
+
   //更新team
   const handleUpdateTeam = async (updateTeam: Team) => {
     try {
@@ -131,6 +150,7 @@ const InfoManage: React.FC = () => {
     const begin = async () => {
       await fetchProfile()
       await fetchTeams()
+      await fetchPosts()
     }
     begin()
   }, [])
@@ -271,6 +291,13 @@ const InfoManage: React.FC = () => {
                   fetchTeams={fetchTeams}
                   onUpdateTeam={handleUpdateTeam}
                 />
+              </div>
+
+              <div className='flex flex-col justify-center w-full p-[1.25rem]'>
+                <div className='flex flex-row justify-between items-center relative w-full'>
+                  <p className='font-bold text-[1.25rem] text-white'>我的帖子</p>
+                </div>
+                <PostList data={posts} loading={loading} onRefresh={fetchPosts} />
               </div>
             </div>
           </div>
