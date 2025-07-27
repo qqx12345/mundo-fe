@@ -23,7 +23,7 @@ let longtoken: string | null = localStorage.getItem('longtoken')
 // 获取当前缓存的值（初始值）
 export const getLongToken = (): string | null => longtoken
 let authApi = axios.create({
-  baseURL: imrorIamttv.VITE_URL
+  baseURL: import.meta.env.VITE_authURL,
   headers: {
     'Content-Type': 'application/json',
     Authorization: 'Bearer ' + longtoken
@@ -42,7 +42,7 @@ let api = axios.create({
 export const refreshLongToken = (): string | null => {
   longtoken = localStorage.getItem('longtoken')
   authApi = axios.create({
-    baseURL: import.meta.env.VITE_authURL,
+    baseURL: "https://ezxalnqhtxba.sealosbja.site/mundo-auth-hub/api",
     headers: {
       'Content-Type': 'application/json',
       Authorization: 'Bearer ' + longtoken
