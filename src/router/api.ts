@@ -23,7 +23,7 @@ let longtoken: string | null = localStorage.getItem('longtoken')
 // 获取当前缓存的值（初始值）
 export const getLongToken = (): string | null => longtoken
 let authApi = axios.create({
-  baseURL: import.meta.env.VITE_authURL,
+  baseURL: imrorIamttv.VITE_URL
   headers: {
     'Content-Type': 'application/json',
     Authorization: 'Bearer ' + longtoken
@@ -980,6 +980,24 @@ export const searchTeam = async (search: string) => {
     params: {
       search: search
     },
+    headers: {
+      Authorization: `Bearer ${longtoken}`
+    }
+  })
+  return response
+}
+
+export const postResource = async (title: string, id: number, files: File[]) => {
+  const formData = new FormData()
+  formData.append('name', title)
+  formData.append('folder_id', id.toString())
+  for (const file of files) {
+    formData.append('file', file);
+  }
+  for (let pair of formData.entries()) {
+    console.log(pair[0], pair[1]);
+  }
+  const response = await api.post('/sealos/file', formData, {
     headers: {
       Authorization: `Bearer ${longtoken}`
     }

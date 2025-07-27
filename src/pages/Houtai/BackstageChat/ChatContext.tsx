@@ -126,9 +126,9 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
           prevContacts.map(contact =>
             contact.id === senderId
               ? {
-                  ...contact,
-                  messages: [...contact.messages, { sender, text: newMessage.content }]
-                }
+                ...contact,
+                messages: [...contact.messages, { sender, text: newMessage.content }]
+              }
               : contact
           )
         )
@@ -138,9 +138,9 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
           prevContacts.map(contact =>
             contact.id === receiverId
               ? {
-                  ...contact,
-                  messages: [...contact.messages, { sender, text: newMessage.content }]
-                }
+                ...contact,
+                messages: [...contact.messages, { sender, text: newMessage.content }]
+              }
               : contact
           )
         )
@@ -183,9 +183,9 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
       prevContacts.map(contact =>
         contact.id === contactId
           ? {
-              ...contact,
-              messages: [...contact.messages, { sender: 'me', text: message }]
-            }
+            ...contact,
+            messages: [...contact.messages, { sender: 'me', text: message }]
+          }
           : contact
       )
     )
