@@ -42,7 +42,7 @@ let api = axios.create({
 export const refreshLongToken = (): string | null => {
   longtoken = localStorage.getItem('longtoken')
   authApi = axios.create({
-    baseURL: "https://ezxalnqhtxba.sealosbja.site/mundo-auth-hub/api",
+    baseURL: import.meta.env.VITE_authURL,
     headers: {
       'Content-Type': 'application/json',
       Authorization: 'Bearer ' + longtoken
