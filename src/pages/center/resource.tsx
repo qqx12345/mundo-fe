@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react'
-import { useAuth } from '@/context/AuthContext'
 import styles from './CreatorCenter.module.css'
 import { postResource } from '../../router/api'
+import { Button, Message, Input } from '@arco-design/web-react'
 
 interface ResourceForm {
   title: string
@@ -9,20 +9,24 @@ interface ResourceForm {
   files: File[]
 }
 
+// 默认表单数据
+const DEFAULT_FORM_DATA: ResourceForm = {
+  title: '',
+  id: 0,
+  files: []
+}
+
 const Resource = () => {
   const [loading, setLoading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [formData, setFormData] = useState<ResourceForm>({
-    title: '',
-    id: 0,
-    files: []
-  })
+  const [formData, setFormData] = useState<ResourceForm>(DEFAULT_FORM_DATA)
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    value: string, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const { name, value } = e.target
+    const { name } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
+
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,9 +36,6 @@ const Resource = () => {
         files: [...prev.files, ...Array.from(e.target.files!)]
       }))
     }
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ""
-    }
   }
 
 
@@ -43,25 +44,24 @@ const Resource = () => {
       ...prev,
       files: prev.files.filter((_, i) => i !== index)
     }))
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""
+    }
   }
 
   const handleSubmit = async () => {
     if (!formData.files.length) {
-      alert('请先选择要上传的文件')
+      Message.error('请先选择要上传的文件')
       return
     }
     setLoading(true)
 
     try {
       const res = await postResource(formData.title, formData.id, formData.files)
-      alert('上传成功！')
-      setFormData({
-        title: '',
-        id: 0,
-        files: []
-      })
+      Message.success('上传成功！')
+      setFormData(DEFAULT_FORM_DATA)
     } catch (err) {
-      alert(err)
+      Message.error("上传失败")
     } finally {
       setLoading(false)
     }
@@ -69,7 +69,7 @@ const Resource = () => {
 
   return (
     <div className={styles.editorContainer}>
-      <input
+      <Input
         type='text'
         name='title'
         value={formData.title}
@@ -99,22 +99,24 @@ const Resource = () => {
               {file.type.startsWith('image/') ? (
                 <div style={{ position: 'relative' }}>
                   <img src={URL.createObjectURL(file)} alt={file.name} />
-                  <button
+                  <Button
                     onClick={() => handleRemoveFile(index)}
+                    shape='circle'
                     className={styles.removeButton}
                   >
                     ×
-                  </button>
+                  </Button>
                 </div>
               ) : (
                 <div style={{ position: 'relative' }}>
                   <span className={styles.fileName}>{file.name}</span>
-                  <button
+                  <Button
                     onClick={() => handleRemoveFile(index)}
+                    shape='circle'
                     className={styles.removeButton}
                   >
                     ×
-                  </button>
+                  </Button>
                 </div>
               )}
             </div>
@@ -122,13 +124,15 @@ const Resource = () => {
         </div>
       )}
 
-      <button
+      <Button
+        type="primary"
         className={styles.submitButton}
+        size="large"
         onClick={handleSubmit}
         disabled={loading || !formData.title.trim() || !formData.files.length}
       >
         {loading ? <div className={styles.loadingSpinner}></div> : '上传资料'}
-      </button>
+      </Button>
     </div>
   )
 }

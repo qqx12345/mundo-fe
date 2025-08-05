@@ -992,10 +992,7 @@ export const postResource = async (title: string, id: number, files: File[]) => 
   formData.append('name', title)
   formData.append('folder_id', id.toString())
   for (const file of files) {
-    formData.append('file', file);
-  }
-  for (let pair of formData.entries()) {
-    console.log(pair[0], pair[1]);
+    formData.append('file', file)
   }
   const response = await api.post('/sealos/file', formData, {
     headers: {
