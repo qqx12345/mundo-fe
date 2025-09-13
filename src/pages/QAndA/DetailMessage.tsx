@@ -8,6 +8,8 @@ import { AiOutlineLike, AiFillLike } from 'react-icons/ai'
 import { getDetail, sendAnswer, changelike, checklike } from '@/router/api'
 import { Carousel, Message } from '@arco-design/web-react'
 import MobileDetailMessage from './MobileDetailMessage'
+import DOMPurify from 'dompurify';
+import Editor from '@/components/QuillEditor'; 
 
 interface Answer {
   id: number
@@ -67,6 +69,8 @@ const QuestionContext = React.createContext<{
 const DetailQuestion: React.FC<DetailQuestionProps> = ({ title, question, views }) => {
   const { picture, tags } = React.useContext(QuestionContext)
   const [isOpen, setIsOpen] = useState(-1)
+  const cleanQuestion = DOMPurify.sanitize(question);
+
   return (
     <div className={Style.DetailQuestion}>
       <div className={Style.detailTitle}>
@@ -80,7 +84,7 @@ const DetailQuestion: React.FC<DetailQuestionProps> = ({ title, question, views 
           ))}
         </div>
       </div>
-      <div className={Style.detailQuestion}>{question}</div>
+      <div className={Style.detailQuestion} dangerouslySetInnerHTML={{ __html: cleanQuestion }} />
       {picture.length > 0 && (
         <Carousel style={{ width: '100%', height: 360 }}>
           {picture.map((pic: string, index: number) => (
@@ -192,7 +196,7 @@ const ReplyItem: React.FC<{ answerData: Answer }> = ({ answerData }) => {
         <div className={Style.username}>{answerData.username}</div>
       </div>
       <div className={Style.content}>
-        <div className={Style.replyTime}>{answerData.content}</div>
+        <div className={Style.replyTime} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(answerData.content) }} />
         {answerData.picture?.length > 0 && (
           <div className={Style.answerPictures}>
             {answerData.picture.map((pic: string, index: number) => (
@@ -218,7 +222,7 @@ const ReplyItem: React.FC<{ answerData: Answer }> = ({ answerData }) => {
 
 const Inputbox: React.FC<InputboxProps> = ({ id }) => {
   const [loading, setloading] = useState(false)
-  const editableDivRef = useRef<HTMLDivElement>(null)
+  // const editableDivRef = useRef<HTMLDivElement>(null)
   const [formdata, setformdata] = useState<FormData>({
     content: '',
     picture: []
@@ -244,17 +248,25 @@ const Inputbox: React.FC<InputboxProps> = ({ id }) => {
     }
   }
 
-  const handleContentChange = (e: React.FormEvent<HTMLDivElement>) => {
-    const content = e.currentTarget.textContent || ''
+  const handleContentChange = (value: string) => {
     setformdata(prevData => ({
       ...prevData,
-      content
+      content: value
     }))
   }
 
+  // 定义一个函数用于去除 HTML 标签并统计字数
+  const getTextLength = (html: string) => {
+    console.log(html);123
+    
+    const text = html.replace(/<[^>]*>?/gm, ''); // 使用正则表达式去除 HTML 标签
+    return text.length;
+  };
+
   const submit = async () => {
-    if (formdata.content.length == 0) {
-      return
+    const textLength = getTextLength(formdata.content);
+    if (textLength === 0) {
+      return;
     }
     const formDataToSend = new FormData()
     formDataToSend.append('content', formdata.content)
@@ -264,10 +276,9 @@ const Inputbox: React.FC<InputboxProps> = ({ id }) => {
     setloading(true)
     sendAnswer(Number(id), formDataToSend).then(response => {
       try {
-        if (response.status == 200) {
-          if (editableDivRef.current) {
-            editableDivRef.current.innerHTML = '' // 清空内容
-          }
+        if (response.status === 200) {
+          // 清空富文本内容
+          handleContentChange('') 
           Message.success('发表成功，等待审核通过后展示')
           setformdata({
             content: '',
@@ -282,15 +293,15 @@ const Inputbox: React.FC<InputboxProps> = ({ id }) => {
       }
     })
   }
+
   return (
     <div className={Style.inputbox}>
-      <div
-        ref={editableDivRef}
+      {/* 使用 QuillEditor 组件 */}
+      <Editor 
+        value={formdata.content} 
+        onChange={handleContentChange}
         className={Style.richinput}
-        contentEditable='true'
-        data-placeholder='平等表达，友善交流'
-        onInput={handleContentChange}
-      ></div>
+      />
       <div className={Style.picturelist}>
         {formdata.picture &&
           formdata.picture.map((photo, index) => {
@@ -326,11 +337,12 @@ const Inputbox: React.FC<InputboxProps> = ({ id }) => {
           />
         </div>
         <div>
-          <span className={Style.wordlimit}>{formdata.content.length}/200</span>
+          {/* 使用 getTextLength 函数统计纯文本字数 */}
+          <span className={Style.wordlimit}>{getTextLength(formdata.content)}/200</span>
           <button
             className={Style.send}
             onClick={submit}
-            style={{ opacity: formdata.content.length > 0 ? '1' : '0.6' }}
+            style={{ opacity: getTextLength(formdata.content) > 0 ? '1' : '0.6' }}
           >
             {loading ? (
               <div className={Style.box}>

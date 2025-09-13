@@ -1,9 +1,15 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useRef, useEffect } from 'react'
 import ReactQuill from 'react-quill'
 import 'react-quill/dist/quill.snow.css' // 样式
 import styles from './editor.module.css'
-const Editor = () => {
-  const [value, setValue] = useState('')
+
+interface EditorProps {
+  value: string
+  onChange: (value: string) => void
+  className?: string
+}
+
+const Editor: React.FC<EditorProps> = ({ value, onChange, className }) => {
   const quillRef = useRef<ReactQuill>(null)
 
   useEffect(() => {
@@ -27,6 +33,7 @@ const Editor = () => {
 
       // 设置默认字体（可选）
       quill.format('font', 'roboto')
+      quill.format('color', 'white')
     }
   }, [])
 
@@ -63,9 +70,11 @@ const Editor = () => {
         placeholder='请输入内容'
         modules={modules}
         className={styles.specialEditor}
+        value={value}
+        onChange={onChange}
       />
       {/* <ReactQuill theme='snow' value={value} onChange={setValue} placeholder='请输入内容' modules={modules} /> */}
-      {/* <p>编辑器内容：</p> */}
+      {/* <p>编辑器内容：</p>  */}
       {/* <div dangerouslySetInnerHTML={{ __html: value }} /> */}
     </div>
   )

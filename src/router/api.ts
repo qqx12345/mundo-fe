@@ -393,13 +393,9 @@ export const getMyTeam = async (token: string) => {
 }
 
 //获取我的帖子
-export const getMyPosts = async (token: string) => {
+export const getMyPosts = async () => {
   try {
-    const response = await api.get('/question/posted', {
-      headers: {
-        Authorization: 'Bearer ' + token
-      }
-    })
+    const response = await api.get('/question/posted')
     return response.data?.data?.allPosts
   } catch (error) {
     console.log('获取用户帖子失败', error)
@@ -408,13 +404,9 @@ export const getMyPosts = async (token: string) => {
 }
 
 //删除我的帖子
-export const deleteMyPost = async (token: string | null, id: number) => {
+export const deleteMyPost = async (id: number) => {
   try {
-    const response = await api.delete(`/question/posts/${id}`, {
-      headers: {
-        Authorization: 'Bearer ' + token
-      }
-    })
+    const response = await api.delete(`/question/posts/${id}`)
     return response.data?.message
   } catch (error) {
     console.log('删除该帖子失败！', error)

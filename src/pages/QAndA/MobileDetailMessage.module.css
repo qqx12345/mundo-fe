@@ -59,7 +59,7 @@
 .DetailQuestion .detailTitle {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: left;
 }
 .questionMessage {
   text-align: left;
@@ -112,6 +112,8 @@
   transition: all 0.3s ease;
   border: 1px solid rgba(255, 255, 255, 0.1);
   text-align: left;
+  height: 100%;
+  overflow: auto;
 }
 
 .inputbox:focus-within {

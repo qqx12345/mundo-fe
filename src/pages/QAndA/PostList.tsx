@@ -21,6 +21,15 @@ const PostList = ({ data, loading }: { data: Post[]; loading: boolean }) => {
     navigate(`/qanda/${messageId}`)
   }
 
+  // 添加提取第一个p标签内容的辅助函数
+  const extractFirstParagraph = (htmlString: string) => {
+    if (!htmlString) return htmlString;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlString, 'text/html');
+    const firstP = doc.querySelector('p');
+    return firstP ? firstP.innerHTML : htmlString;
+  };
+
   return (
     <div className='flex flex-col px-[2rem]'>
       {data.map(message => (
@@ -36,7 +45,10 @@ const PostList = ({ data, loading }: { data: Post[]; loading: boolean }) => {
                   {message.title ? message.title : '无标题'}
                 </div>
                 <div className='font-medium text-[15px] leading-[22px] text-[--color-text-2] text-left overflow-hidden text-ellipsis whitespace-nowrap'>
-                  {message.content ? message.content : '无内容'}
+                  <Typography.Text>
+                    <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'inline-block', maxWidth: '100%' }} 
+                      dangerouslySetInnerHTML={{ __html: extractFirstParagraph(message.content) || '无内容' }} />
+                  </Typography.Text>
                 </div>
               </div>
 

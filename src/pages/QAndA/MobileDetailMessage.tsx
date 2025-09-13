@@ -6,7 +6,9 @@ import { ImFilePicture } from 'react-icons/im'
 import { AiOutlineLike, AiFillLike } from 'react-icons/ai'
 import { getDetail, sendAnswer, changelike, checklike } from '@/router/api'
 import { Carousel, Notification, Message } from '@arco-design/web-react'
-import RichInput from './RichInput'
+import DOMPurify from 'dompurify'
+import Editor from '@/components/QuillEditor'; 
+
 interface Answer {
   id: number
   uid: number
@@ -64,10 +66,11 @@ const QuestionContext = React.createContext<{
 const DetailQuestion: React.FC<DetailQuestionProps> = ({ title, question, views }) => {
   const { picture, tags } = React.useContext(QuestionContext)
   const [isOpen, setIsOpen] = useState(-1)
+  const cleanQuestion = DOMPurify.sanitize(question);
   return (
     <div className={Style.DetailQuestion}>
       <div className={Style.Title}>{title}</div>
-      <div className={Style.questionMessage}>{question}</div>
+      <div className={Style.detailQuestion} dangerouslySetInnerHTML={{ __html: cleanQuestion }} />
       {picture.length > 0 && (
         <Carousel style={{ width: '100%', height: 200, margin: 'auto' }}>
           {picture.map((pic: string, index: number) => (
@@ -185,7 +188,8 @@ const ReplyItem: React.FC<{ answerData: Answer }> = ({ answerData }) => {
         <div className={Style.username}>{answerData.username}</div>
       </div>
       <div className={Style.content}>
-        <div className={Style.replyTime}>{answerData.content}</div>
+        <div className={Style.replyTime} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(answerData.content) }} />
+
         {answerData.picture?.length > 0 && (
           <div className={Style.answerPictures}>
             {answerData.picture.map((pic: string, index: number) => (
@@ -211,12 +215,20 @@ const ReplyItem: React.FC<{ answerData: Answer }> = ({ answerData }) => {
 
 const Inputbox: React.FC<InputboxProps> = ({ id }) => {
   const [loading, setloading] = useState(false)
-  const editableDivRef = useRef<HTMLDivElement>(null)
-  const [inputValue, setInputValue] = useState('')
+  // 删除这行：editableDivRef声明
+  // const editableDivRef = useRef<HTMLDivElement>(null)
+  // 删除这行：inputValue状态
+  // const [inputValue, setInputValue] = useState('')
   const [formdata, setformdata] = useState<FormData>({
     content: '',
     picture: []
   })
+
+  // 添加内容变化处理函数
+  const handleContentChange = (value: string) => {
+    setformdata(prev => ({ ...prev, content: value }));
+  };
+
   const handleRemoveImage = (index: number) => {
     setformdata(prev => ({
       ...prev,
@@ -239,11 +251,13 @@ const Inputbox: React.FC<InputboxProps> = ({ id }) => {
   }
 
   const submit = async () => {
-    if (inputValue.length === 0) {
-      return
+    // 使用富文本内容长度替代原inputValue检查
+    const textLength = getTextLength(formdata.content);
+    if (textLength === 0) {
+      return;
     }
     const formDataToSend = new FormData()
-    formDataToSend.append('content', inputValue)
+    formDataToSend.append('content', formdata.content) // 使用formdata.content
     formdata.picture.forEach(file => {
       formDataToSend.append(`picture`, file)
     })
@@ -251,14 +265,16 @@ const Inputbox: React.FC<InputboxProps> = ({ id }) => {
     sendAnswer(Number(id), formDataToSend).then(response => {
       try {
         if (response.status == 200) {
-          if (editableDivRef.current) {
-            editableDivRef.current.innerHTML = ''
-          }
+          // 删除这部分代码
+          // if (editableDivRef.current) {
+          //   editableDivRef.current.innerHTML = ''
+          // }
           setformdata({
             content: '',
             picture: []
           })
-          setInputValue('')
+          // 删除这行
+          // setInputValue('')
           Notification.success({
             title: '回答成功',
             content: '您的回答已提交，审核通过后显示！'
@@ -272,9 +288,17 @@ const Inputbox: React.FC<InputboxProps> = ({ id }) => {
       }
     })
   }
-  return (
+  return (<div>
     <div className={Style.inputbox}>
-      <RichInput value={inputValue} onChange={setInputValue} />
+      {/* 替换RichInput为QuillEditor */}
+      <div >
+        <Editor 
+          value={formdata.content} 
+          onChange={handleContentChange}
+          className={Style.richinput}
+        /> 
+      </div>
+      </div>
       <div className={Style.picturelist}>
         {formdata.picture &&
           formdata.picture.map((photo, index) => {
@@ -310,11 +334,11 @@ const Inputbox: React.FC<InputboxProps> = ({ id }) => {
           />
         </div>
         <div>
-          <span className={Style.wordlimit}>{inputValue.length}/200</span>
+          <span className={Style.wordlimit}>{getTextLength(formdata.content)}/200</span>
           <button
             className={Style.send}
             onClick={submit}
-            style={{ opacity: inputValue.length > 0 ? '1' : '0.6' }}
+            style={{ opacity: getTextLength(formdata.content) > 0 ? '1' : '0.6' }}
           >
             {loading ? (
               <div className={Style.box}>
@@ -467,3 +491,9 @@ const DetailMessage: React.FC = () => {
 }
 
 export default DetailMessage
+
+// 添加HTML标签过滤函数（从DetailMessage复用）
+const getTextLength = (html: string) => {
+  const text = html.replace(/<[^>]*>?/gm, ''); // 去除HTML标签
+  return text.length;
+};

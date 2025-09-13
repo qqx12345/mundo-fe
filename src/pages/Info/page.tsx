@@ -105,7 +105,7 @@ const InfoManage: React.FC = () => {
   const fetchPosts = async () => {
     setLoading(true)
     try {
-      const data = await getMyPosts(token as string)
+      const data = await getMyPosts()
       setPosts(data)
     } catch (e) {
       setPosts([])
